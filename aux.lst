@@ -1,0 +1,753 @@
+1    |      | **********************************
+2    |      | *PROGRAMA DE EJEMPLO
+3    |      | **********************************
+4    |      | 1026     | PACTL            | EQU   | $1026
+5    |      | 1027     | PACNT            | EQU   | $1027
+6    |      | 1030     | ADCTL            | EQU   | $1030
+7    |      | 1031     | ADR1             | EQU   | $1031
+8    |      | 1032     | ADR2             | EQU   | $1032
+9    |      | 1033     | ADR3             | EQU   | $1033
+10   |      | 1034     | ADR4             | EQU   | $1034
+11   |      | 1039     | OPTION           | EQU   | $1039
+12   |      |          |                  |       |
+13   |      | 1000     | PORTA            | EQU   | $1000
+14   |      | 1008     | PORTD            | EQU   | $1008
+15   |      | 100A     | PORTE            | EQU   | $100A
+16   |      | 1002     | PORTG            | EQU   | $1002
+17   |      |          |                  |       |
+18   |      | 1001     | DDRA             | EQU   | $1001
+19   |      | 1009     | DDRD             | EQU   | $1009
+20   |      | 1003     | DDRG             | EQU   | $1003
+21   |      |          |                  |       |
+22   |      | 1024     | TMSK2            | EQU   | $1024
+23   |      | 1025     | TFLG2            | EQU   | $1025
+24   |      |          |                  |       |
+25   |      | 102F     | SCDR             | EQU   | $102F
+26   |      | 102D     | SCCR2            | EQU   | $102D
+27   |      | 102E     | SCSR             | EQU   | $102E
+28   |      | 102C     | SCCR1            | EQU   | $102C
+29   |      | 102B     | BAUD             | EQU   | $102B
+30   |      | 103C     | HPRIO            | EQU   | $103C
+31   |      | 1028     | SPCR             | EQU   | $1028
+32   |      | 105D     | CSCTL            | EQU   | $105D
+33   |      | 1038     | OPT2             | EQU   | $1038
+34   |      |          |                  |       |
+35   |      | * VARIABLES *********************
+36   |      |          |                  |       |
+37   |      | 0C       | ORDEN            | EQU   | $000C
+38   |      | 0D       | SEG              | EQU   | $000D
+39   |      | 0E       | U1               | EQU   | $000E
+40   |      | 0F       | U2               | EQU   | $000F
+41   |      | 10       | U3               | EQU   | $0010
+42   |      | 11       | U4               | EQU   | $0011
+43   |      | 12       | U5               | EQU   | $0012
+44   |      | 13       | V1               | EQU   | $0013
+45   |      | 14       | V2               | EQU   | $0014
+46   |      | 15       | BAS_H            | EQU   | $0015
+47   |      | 16       | BAS_L            | EQU   | $0016
+48   |      | 17       | V5               | EQU   | $0017
+49   |      | 18       | TEMPO            | EQU   | $0018
+50   |      | 19       | ALTO             | EQU   | $0019
+51   |      | 1A       | BAJO             | EQU   | $001A
+52   |      | 1B       | BASE_H           | EQU   | $001B
+53   |      | 1C       | BASE_L           | EQU   | $001C
+54   |      | 1D       | V3               | EQU   | $001D
+55   |      | 1E       | V4               | EQU   | $001E
+56   |      |          |                  |       |
+57   |      | **********************************
+58   |      | *CONFIGURA REGISTROS
+59   |      | **********************************
+60   | 8000 |          |                  | ORG   | $8000            * DIR DE INICIO
+61   | 8000 | 8E03FF   |                  | LDS   | #$03FF           * APUNTADOR DE STAK
+62   |      |          |                  |       |
+63   |      |          |                  |       |
+64   | 8003 | 8600     |                  | LDAA  | #$00             * CONFIG TODO EL PUERTO  A COMO ENTRADAS
+65   | 8005 | B71001   |                  | STAA  | DDRA             * EL PUERTO A
+66   |      |          |                  |       |
+67   | 8008 | 86FF     |                  | LDAA  | #$FF             * CONFIG TODO EL PUERTO  G COMO SALIDAS
+68   | 800A | B71003   |                  | STAA  | DDRG             * EL PUERTO G 
+69   |      |          |                  |       |
+70   | 800D | 8600     |                  | LDAA  | #$00             * SE PONE PUERTO G EN CEROS
+71   | 800F | B71002   |                  | STAA  | PORTG            
+72   |      |          |                  |       |
+73   | 8012 | CC302C   |                  | LDD   | #$302C           * CONFIGURA PUERTO SERIAL
+74   | 8015 | B7102B   |                  | STAA  | BAUD             * BAUD  9600  para cristal de 8MHz
+75   | 8018 | F7102D   |                  | STAB  | SCCR2            * HABILITA  RX Y TX PERO INTERRUPCN SOLO RX
+76   | 801B | 8600     |                  | LDAA  | #$00             
+77   | 801D | B7102C   |                  | STAA  | SCCR1            * 8 BITS
+78   |      |          |                  |       |
+79   | 8020 | 86FE     |                  | LDAA  | #$FE             * CONFIG PUERTO D COMO SALIDAS (EXCEPTO PD0)
+80   | 8022 | B71009   |                  | STAA  | DDRD             * SEA  ENABLE DEL DISPLAY  PD4  Y RS PD3
+81   |      |          |                  |       |
+82   |      |          |                  |       |
+83   | 8025 | 8604     |                  | LDAA  | #$04             
+84   | 8027 | B7103C   |                  | STAA  | HPRIO            
+85   |      |          |                  |       |
+86   | 802A | 8600     |                  | LDAA  | #$00             
+87   | 802C | 06       |                  | TAP   |                  
+88   |      |          |                  |       |
+89   |      |          |                  |       |
+90   |      |          |                  |       |
+91   |      |          |                  |       |
+92   |      |          |                  |       |
+93   |      |          |                  |       |
+94   |      |          |                  |       |
+95   |      | **********************************
+96   |      | *PROGRAMA PRINCIPAL
+97   |      | **********************************
+98   | 802D |          |MAIN              |       |                  
+99   | 802D | BDZZZZ   |                  | JSR   | INICIA           
+100  | 8030 | 863F     |                  | LDAA  | #$3F             
+101  | 8032 | 970C     |                  | STAA  | ORDEN            * CARGO UN (?) en 000A
+102  |      |          |                  |       |
+103  |      |          |                  |       |
+104  | 8034 |          |CICLO             |       |                  
+105  | 8034 | 960D     |                  | LDAA  | SEG              
+106  | 8036 | 27ZZ     |                  | BEQ   | CICLO            
+107  | 8038 | 7F000D   |                  | CLR   | SEG              
+108  |      |          |                  |       |
+109  | 803B | B61027   |                  | LDAA  | PACNT            
+110  | 803E | 9717     |                  | STAA  | V5               
+111  | 8040 | 7F1027   |                  | CLR   | PACNT            
+112  |      |          |                  |       |
+113  |      |          |                  |       |
+114  | 8043 | BDZZZZ   |                  | JSR   | DATARX           * DESPLIEGA DATO TRANSMITIDO
+115  | 8046 | 1809     |                  | DEY   |                  
+116  | 8048 | 188F     |                  | XGDY  |                  
+117  | 804A | 9719     |                  | STAA  | ALTO             
+118  | 804C | D71A     |                  | STAB  | BAJO             
+119  | 804E | 188F     |                  | XGDY  |                  
+120  | 8050 | 9619     |                  | LDAA  | ALTO             
+121  | 8052 | D61A     |                  | LDAB  | BAJO             
+122  | 8054 | BDZZZZ   |                  | JSR   | BINBCD           
+123  | 8057 | BDZZZZ   |                  | JSR   | DISPLAY          
+124  | 805A | BDZZZZ   |                  | JSR   | COMA             
+125  | 805D | BDZZZZ   |                  | JSR   | VOLTA            
+126  |      |          |                  |       |
+127  | 8060 | 4F       |                  | CLRA  |                  
+128  | 8061 | D613     |                  | LDAB  | V1               
+129  | 8063 | BDZZZZ   |                  | JSR   | BNBCD            
+130  | 8066 | BDZZZZ   |                  | JSR   | DSPLY            
+131  | 8069 | BDZZZZ   |                  | JSR   | COMA             
+132  |      |          |                  |       |
+133  | 806C | 4F       |                  | CLRA  |                  
+134  | 806D | D614     |                  | LDAB  | V2               
+135  | 806F | BDZZZZ   |                  | JSR   | BNBCD            
+136  | 8072 | BDZZZZ   |                  | JSR   | DSPLY            
+137  | 8075 | BDZZZZ   |                  | JSR   | COMA             
+138  |      |          |                  |       |
+139  | 8078 | 4F       |                  | CLRA  |                  
+140  | 8079 | D61D     |                  | LDAB  | V3               
+141  | 807B | BDZZZZ   |                  | JSR   | BNBCD            
+142  | 807E | BDZZZZ   |                  | JSR   | DSPLY            
+143  | 8081 | BDZZZZ   |                  | JSR   | COMA             
+144  |      |          |                  |       |
+145  | 8084 | 4F       |                  | CLRA  |                  
+146  | 8085 | D61E     |                  | LDAB  | V4               
+147  | 8087 | BDZZZZ   |                  | JSR   | BNBCD            
+148  | 808A | BDZZZZ   |                  | JSR   | DSPLY            
+149  | 808D | BDZZZZ   |                  | JSR   | COMA             
+150  |      |          |                  |       |
+151  | 8090 | 4F       |                  | CLRA  |                  
+152  | 8091 | D617     |                  | LDAB  | V5               
+153  | 8093 | BDZZZZ   |                  | JSR   | BNBCD            
+154  | 8096 | BDZZZZ   |                  | JSR   | DSPLY            
+155  |      |          |                  |       |
+156  | 8099 | BDZZZZ   |                  | JSR   | CRYTRN           
+157  |      |          |                  |       |
+158  | 809C | 7EZZZZ   |                  | JMP   | CICLO            
+159  |      |          |                  |       |
+160  |      |          |                  |       |
+161  |      | ***********************************
+162  |      | * INICIA
+163  |      | ***********************************
+164  | 809F |          |INICIA            |       |                  
+165  |      |          |                  |       |
+166  | 809F | 7F000D   |                  | CLR   | SEG              
+167  |      |          |                  |       |
+168  | 80A2 | 7F1002   |                  | CLR   | PORTG            
+169  | 80A5 | 86F4     |                  | LDAA  | #$F4             
+170  | 80A7 | 9718     |                  | STAA  | TEMPO            * TEMPO ES VARIABLE PARA CONTAR 244 CICLOS
+171  |      |          |                  |       |
+172  | 80A9 | CE1024   |                  | LDX   | #TMSK2           
+173  | 80AC | 1C0040   |                  | BSET  | $00,X,#$40       * HABILITA INTERRUPCION TIMER T-REAL
+174  | 80AF | 0E       |                  | CLI   |                  
+175  |      |          |                  |       |
+176  | 80B0 | CE1026   |                  | LDX   | #PACTL           
+177  | 80B3 | 1C0050   |                  | BSET  | $00,X,#$50       * HABILITA PAEN -ACUMULADOR PULSOS ALTOS-
+178  | 80B6 | 7F1027   |                  | CLR   | PACNT            * BORRA ACUMULADOR DE PULSOS
+179  |      |          |                  |       |
+180  | 80B9 | 8610     |                  | LDAA  | #$10             
+181  | 80BB | 971B     |                  | STAA  | BASE_H           * PONE UN #1060 COMO DIRECCION BASE INICIAL
+182  | 80BD | 8660     |                  | LDAA  | #$60             
+183  | 80BF | 971C     |                  | STAA  | BASE_L           
+184  |      |          |                  |       |
+185  | 80C1 | 18CE1060 |                  | LDY   | #$1060           
+186  |      |          |                  |       |
+187  | 80C5 | 8616     |                  | LDAA  | #$16             
+188  | 80C7 | 9715     |                  | STAA  | BAS_H            * PONE UN #1653 NUMERO TOTAL DE JUEGO DE MUESTRAS
+189  | 80C9 | 8653     |                  | LDAA  | #$53             
+190  | 80CB | 9716     |                  | STAA  | BAS_L            
+191  |      |          |                  |       |
+192  |      |          |                  |       |
+193  | 80CD | 7F0019   |                  | CLR   | ALTO             * INICIA INDICE MUESTRA EN 0
+194  | 80D0 | 7F001A   |                  | CLR   | BAJO             
+195  |      |          |                  |       |
+196  | 80D3 | 39       |                  | RTS   |                  
+197  |      | ***********************************
+198  |      | * SACA
+199  |      | ***********************************
+200  | 80D4 |          |SACA              |       |                  
+201  |      |          |                  |       |
+202  |      |          |                  |       |
+203  | 80D4 | 9619     |                  | LDAA  | ALTO             * INDICE DE MUESTRA (SEGUNDO)
+204  | 80D6 | D61A     |                  | LDAB  | BAJO             
+205  | 80D8 | 188F     |                  | XGDY  |                  
+206  | 80DA | 1808     |                  | INY   |                  
+207  | 80DC | 188F     |                  | XGDY  |                  
+208  | 80DE | BDZZZZ   |                  | JSR   | BINBCD           
+209  | 80E1 | BDZZZZ   |                  | JSR   | DISPLAY          
+210  | 80E4 | BDZZZZ   |                  | JSR   | COMA             
+211  |      |          |                  |       |
+212  | 80E7 | 961B     |                  | LDAA  | BASE_H           * INDICE DE MUESTRA (PARTICULAR)
+213  | 80E9 | D61C     |                  | LDAB  | BASE_L           
+214  | 80EB | 188F     |                  | XGDY  |                  
+215  |      |          |                  |       |
+216  | 80ED | 1808     |                  | INY   |                  
+217  | 80EF | 4F       |                  | CLRA  |                  
+218  | 80F0 | 18E600   |                  | LDAB  | $00,Y            
+219  | 80F3 | BDZZZZ   |                  | JSR   | BNBCD            
+220  | 80F6 | BDZZZZ   |                  | JSR   | DSPLY            
+221  | 80F9 | BDZZZZ   |                  | JSR   | COMA             
+222  |      |          |                  |       |
+223  | 80FC | 1808     |                  | INY   |                  
+224  | 80FE | 4F       |                  | CLRA  |                  
+225  | 80FF | 18E600   |                  | LDAB  | $00,Y            
+226  | 8102 | BDZZZZ   |                  | JSR   | BNBCD            
+227  | 8105 | BDZZZZ   |                  | JSR   | DSPLY            
+228  | 8108 | BDZZZZ   |                  | JSR   | COMA             
+229  |      |          |                  |       |
+230  | 810B | 1808     |                  | INY   |                  
+231  | 810D | 4F       |                  | CLRA  |                  
+232  | 810E | 18E600   |                  | LDAB  | $00,Y            
+233  | 8111 | BDZZZZ   |                  | JSR   | BNBCD            
+234  | 8114 | BDZZZZ   |                  | JSR   | DSPLY            
+235  | 8117 | BDZZZZ   |                  | JSR   | COMA             
+236  |      |          |                  |       |
+237  | 811A | 1808     |                  | INY   |                  
+238  | 811C | 4F       |                  | CLRA  |                  
+239  | 811D | 18E600   |                  | LDAB  | $00,Y            
+240  | 8120 | BDZZZZ   |                  | JSR   | BNBCD            
+241  | 8123 | BDZZZZ   |                  | JSR   | DSPLY            
+242  | 8126 | BDZZZZ   |                  | JSR   | COMA             
+243  |      |          |                  |       |
+244  | 8129 | 1808     |                  | INY   |                  
+245  | 812B | 4F       |                  | CLRA  |                  
+246  | 812C | 18E600   |                  | LDAB  | $00,Y            
+247  | 812F | BDZZZZ   |                  | JSR   | BNBCD            
+248  | 8132 | BDZZZZ   |                  | JSR   | DSPLY            
+249  |      |          |                  |       |
+250  | 8135 | 188F     |                  | XGDY  |                  
+251  | 8137 | 971B     |                  | STAA  | BASE_H           
+1    |      | **********************************
+2    |      | *PROGRAMA DE EJEMPLO
+3    |      | **********************************
+4    |      | 1026     | PACTL            | EQU   | $1026
+5    |      | 1027     | PACNT            | EQU   | $1027
+6    |      | 1030     | ADCTL            | EQU   | $1030
+7    |      | 1031     | ADR1             | EQU   | $1031
+8    |      | 1032     | ADR2             | EQU   | $1032
+9    |      | 1033     | ADR3             | EQU   | $1033
+10   |      | 1034     | ADR4             | EQU   | $1034
+11   |      | 1039     | OPTION           | EQU   | $1039
+12   |      |          |                  |       |
+13   |      | 1000     | PORTA            | EQU   | $1000
+14   |      | 1008     | PORTD            | EQU   | $1008
+15   |      | 100A     | PORTE            | EQU   | $100A
+16   |      | 1002     | PORTG            | EQU   | $1002
+17   |      |          |                  |       |
+18   |      | 1001     | DDRA             | EQU   | $1001
+19   |      | 1009     | DDRD             | EQU   | $1009
+20   |      | 1003     | DDRG             | EQU   | $1003
+21   |      |          |                  |       |
+22   |      | 1024     | TMSK2            | EQU   | $1024
+23   |      | 1025     | TFLG2            | EQU   | $1025
+24   |      |          |                  |       |
+25   |      | 102F     | SCDR             | EQU   | $102F
+26   |      | 102D     | SCCR2            | EQU   | $102D
+27   |      | 102E     | SCSR             | EQU   | $102E
+28   |      | 102C     | SCCR1            | EQU   | $102C
+29   |      | 102B     | BAUD             | EQU   | $102B
+30   |      | 103C     | HPRIO            | EQU   | $103C
+31   |      | 1028     | SPCR             | EQU   | $1028
+32   |      | 105D     | CSCTL            | EQU   | $105D
+33   |      | 1038     | OPT2             | EQU   | $1038
+34   |      |          |                  |       |
+35   |      | * VARIABLES *********************
+36   |      |          |                  |       |
+37   |      | 0C       | ORDEN            | EQU   | $000C
+38   |      | 0D       | SEG              | EQU   | $000D
+39   |      | 0E       | U1               | EQU   | $000E
+40   |      | 0F       | U2               | EQU   | $000F
+41   |      | 10       | U3               | EQU   | $0010
+42   |      | 11       | U4               | EQU   | $0011
+43   |      | 12       | U5               | EQU   | $0012
+44   |      | 13       | V1               | EQU   | $0013
+45   |      | 14       | V2               | EQU   | $0014
+46   |      | 15       | BAS_H            | EQU   | $0015
+47   |      | 16       | BAS_L            | EQU   | $0016
+48   |      | 17       | V5               | EQU   | $0017
+49   |      | 18       | TEMPO            | EQU   | $0018
+50   |      | 19       | ALTO             | EQU   | $0019
+51   |      | 1A       | BAJO             | EQU   | $001A
+52   |      | 1B       | BASE_H           | EQU   | $001B
+53   |      | 1C       | BASE_L           | EQU   | $001C
+54   |      | 1D       | V3               | EQU   | $001D
+55   |      | 1E       | V4               | EQU   | $001E
+56   |      |          |                  |       |
+57   |      | **********************************
+58   |      | *CONFIGURA REGISTROS
+59   |      | **********************************
+60   | 8000 |          |                  | ORG   | $8000            * DIR DE INICIO
+61   | 8000 | 8E03FF   |                  | LDS   | #$03FF           * APUNTADOR DE STAK
+62   |      |          |                  |       |
+63   |      |          |                  |       |
+64   | 8003 | 8600     |                  | LDAA  | #$00             * CONFIG TODO EL PUERTO  A COMO ENTRADAS
+65   | 8005 | B71001   |                  | STAA  | DDRA             * EL PUERTO A
+66   |      |          |                  |       |
+67   | 8008 | 86FF     |                  | LDAA  | #$FF             * CONFIG TODO EL PUERTO  G COMO SALIDAS
+68   | 800A | B71003   |                  | STAA  | DDRG             * EL PUERTO G 
+69   |      |          |                  |       |
+70   | 800D | 8600     |                  | LDAA  | #$00             * SE PONE PUERTO G EN CEROS
+71   | 800F | B71002   |                  | STAA  | PORTG            
+72   |      |          |                  |       |
+73   | 8012 | CC302C   |                  | LDD   | #$302C           * CONFIGURA PUERTO SERIAL
+74   | 8015 | B7102B   |                  | STAA  | BAUD             * BAUD  9600  para cristal de 8MHz
+75   | 8018 | F7102D   |                  | STAB  | SCCR2            * HABILITA  RX Y TX PERO INTERRUPCN SOLO RX
+76   | 801B | 8600     |                  | LDAA  | #$00             
+77   | 801D | B7102C   |                  | STAA  | SCCR1            * 8 BITS
+78   |      |          |                  |       |
+79   | 8020 | 86FE     |                  | LDAA  | #$FE             * CONFIG PUERTO D COMO SALIDAS (EXCEPTO PD0)
+80   | 8022 | B71009   |                  | STAA  | DDRD             * SEA  ENABLE DEL DISPLAY  PD4  Y RS PD3
+81   |      |          |                  |       |
+82   |      |          |                  |       |
+83   | 8025 | 8604     |                  | LDAA  | #$04             
+84   | 8027 | B7103C   |                  | STAA  | HPRIO            
+85   |      |          |                  |       |
+86   | 802A | 8600     |                  | LDAA  | #$00             
+87   | 802C | 06       |                  | TAP   |                  
+88   |      |          |                  |       |
+89   |      |          |                  |       |
+90   |      |          |                  |       |
+91   |      |          |                  |       |
+92   |      |          |                  |       |
+93   |      |          |                  |       |
+94   |      |          |                  |       |
+95   |      | **********************************
+96   |      | *PROGRAMA PRINCIPAL
+97   |      | **********************************
+98   | 802D |          |MAIN              |       |                  
+99   | 802D | BDZZZZ   |                  | JSR   | INICIA           
+100  | 8030 | 863F     |                  | LDAA  | #$3F             
+101  | 8032 | 970C     |                  | STAA  | ORDEN            * CARGO UN (?) en 000A
+102  |      |          |                  |       |
+103  |      |          |                  |       |
+104  | 8034 |          |CICLO             |       |                  
+105  | 8034 | 960D     |                  | LDAA  | SEG              
+106  | 8036 | 27ZZ     |                  | BEQ   | CICLO            
+107  | 8038 | 7F000D   |                  | CLR   | SEG              
+108  |      |          |                  |       |
+109  | 803B | B61027   |                  | LDAA  | PACNT            
+110  | 803E | 9717     |                  | STAA  | V5               
+111  | 8040 | 7F1027   |                  | CLR   | PACNT            
+112  |      |          |                  |       |
+113  |      |          |                  |       |
+114  | 8043 | BDZZZZ   |                  | JSR   | DATARX           * DESPLIEGA DATO TRANSMITIDO
+115  | 8046 | 1809     |                  | DEY   |                  
+116  | 8048 | 188F     |                  | XGDY  |                  
+117  | 804A | 9719     |                  | STAA  | ALTO             
+118  | 804C | D71A     |                  | STAB  | BAJO             
+119  | 804E | 188F     |                  | XGDY  |                  
+120  | 8050 | 9619     |                  | LDAA  | ALTO             
+121  | 8052 | D61A     |                  | LDAB  | BAJO             
+122  | 8054 | BDZZZZ   |                  | JSR   | BINBCD           
+123  | 8057 | BDZZZZ   |                  | JSR   | DISPLAY          
+124  | 805A | BDZZZZ   |                  | JSR   | COMA             
+125  | 805D | BDZZZZ   |                  | JSR   | VOLTA            
+126  |      |          |                  |       |
+127  | 8060 | 4F       |                  | CLRA  |                  
+128  | 8061 | D613     |                  | LDAB  | V1               
+129  | 8063 | BDZZZZ   |                  | JSR   | BNBCD            
+130  | 8066 | BDZZZZ   |                  | JSR   | DSPLY            
+131  | 8069 | BDZZZZ   |                  | JSR   | COMA             
+132  |      |          |                  |       |
+133  | 806C | 4F       |                  | CLRA  |                  
+134  | 806D | D614     |                  | LDAB  | V2               
+135  | 806F | BDZZZZ   |                  | JSR   | BNBCD            
+136  | 8072 | BDZZZZ   |                  | JSR   | DSPLY            
+137  | 8075 | BDZZZZ   |                  | JSR   | COMA             
+138  |      |          |                  |       |
+139  | 8078 | 4F       |                  | CLRA  |                  
+140  | 8079 | D61D     |                  | LDAB  | V3               
+141  | 807B | BDZZZZ   |                  | JSR   | BNBCD            
+142  | 807E | BDZZZZ   |                  | JSR   | DSPLY            
+143  | 8081 | BDZZZZ   |                  | JSR   | COMA             
+144  |      |          |                  |       |
+145  | 8084 | 4F       |                  | CLRA  |                  
+146  | 8085 | D61E     |                  | LDAB  | V4               
+147  | 8087 | BDZZZZ   |                  | JSR   | BNBCD            
+148  | 808A | BDZZZZ   |                  | JSR   | DSPLY            
+149  | 808D | BDZZZZ   |                  | JSR   | COMA             
+150  |      |          |                  |       |
+151  | 8090 | 4F       |                  | CLRA  |                  
+152  | 8091 | D617     |                  | LDAB  | V5               
+153  | 8093 | BDZZZZ   |                  | JSR   | BNBCD            
+154  | 8096 | BDZZZZ   |                  | JSR   | DSPLY            
+155  |      |          |                  |       |
+156  | 8099 | BDZZZZ   |                  | JSR   | CRYTRN           
+157  |      |          |                  |       |
+158  | 809C | 7EZZZZ   |                  | JMP   | CICLO            
+159  |      |          |                  |       |
+160  |      |          |                  |       |
+161  |      | ***********************************
+162  |      | * INICIA
+163  |      | ***********************************
+164  | 809F |          |INICIA            |       |                  
+165  |      |          |                  |       |
+166  | 809F | 7F000D   |                  | CLR   | SEG              
+167  |      |          |                  |       |
+168  | 80A2 | 7F1002   |                  | CLR   | PORTG            
+169  | 80A5 | 86F4     |                  | LDAA  | #$F4             
+170  | 80A7 | 9718     |                  | STAA  | TEMPO            * TEMPO ES VARIABLE PARA CONTAR 244 CICLOS
+171  |      |          |                  |       |
+172  | 80A9 | CE1024   |                  | LDX   | #TMSK2           
+173  | 80AC | 1C0040   |                  | BSET  | $00,X,#$40       * HABILITA INTERRUPCION TIMER T-REAL
+174  | 80AF | 0E       |                  | CLI   |                  
+175  |      |          |                  |       |
+176  | 80B0 | CE1026   |                  | LDX   | #PACTL           
+177  | 80B3 | 1C0050   |                  | BSET  | $00,X,#$50       * HABILITA PAEN -ACUMULADOR PULSOS ALTOS-
+178  | 80B6 | 7F1027   |                  | CLR   | PACNT            * BORRA ACUMULADOR DE PULSOS
+179  |      |          |                  |       |
+180  | 80B9 | 8610     |                  | LDAA  | #$10             
+181  | 80BB | 971B     |                  | STAA  | BASE_H           * PONE UN #1060 COMO DIRECCION BASE INICIAL
+182  | 80BD | 8660     |                  | LDAA  | #$60             
+183  | 80BF | 971C     |                  | STAA  | BASE_L           
+184  |      |          |                  |       |
+185  | 80C1 | 18CE1060 |                  | LDY   | #$1060           
+186  |      |          |                  |       |
+187  | 80C5 | 8616     |                  | LDAA  | #$16             
+188  | 80C7 | 9715     |                  | STAA  | BAS_H            * PONE UN #1653 NUMERO TOTAL DE JUEGO DE MUESTRAS
+189  | 80C9 | 8653     |                  | LDAA  | #$53             
+190  | 80CB | 9716     |                  | STAA  | BAS_L            
+191  |      |          |                  |       |
+192  |      |          |                  |       |
+193  | 80CD | 7F0019   |                  | CLR   | ALTO             * INICIA INDICE MUESTRA EN 0
+194  | 80D0 | 7F001A   |                  | CLR   | BAJO             
+195  |      |          |                  |       |
+196  | 80D3 | 39       |                  | RTS   |                  
+197  |      | ***********************************
+198  |      | * SACA
+199  |      | ***********************************
+200  | 80D4 |          |SACA              |       |                  
+201  |      |          |                  |       |
+202  |      |          |                  |       |
+203  | 80D4 | 9619     |                  | LDAA  | ALTO             * INDICE DE MUESTRA (SEGUNDO)
+204  | 80D6 | D61A     |                  | LDAB  | BAJO             
+205  | 80D8 | 188F     |                  | XGDY  |                  
+206  | 80DA | 1808     |                  | INY   |                  
+207  | 80DC | 188F     |                  | XGDY  |                  
+208  | 80DE | BDZZZZ   |                  | JSR   | BINBCD           
+209  | 80E1 | BDZZZZ   |                  | JSR   | DISPLAY          
+210  | 80E4 | BDZZZZ   |                  | JSR   | COMA             
+211  |      |          |                  |       |
+212  | 80E7 | 961B     |                  | LDAA  | BASE_H           * INDICE DE MUESTRA (PARTICULAR)
+213  | 80E9 | D61C     |                  | LDAB  | BASE_L           
+214  | 80EB | 188F     |                  | XGDY  |                  
+215  |      |          |                  |       |
+216  | 80ED | 1808     |                  | INY   |                  
+217  | 80EF | 4F       |                  | CLRA  |                  
+218  | 80F0 | 18E600   |                  | LDAB  | $00,Y            
+219  | 80F3 | BDZZZZ   |                  | JSR   | BNBCD            
+220  | 80F6 | BDZZZZ   |                  | JSR   | DSPLY            
+221  | 80F9 | BDZZZZ   |                  | JSR   | COMA             
+222  |      |          |                  |       |
+223  | 80FC | 1808     |                  | INY   |                  
+224  | 80FE | 4F       |                  | CLRA  |                  
+225  | 80FF | 18E600   |                  | LDAB  | $00,Y            
+226  | 8102 | BDZZZZ   |                  | JSR   | BNBCD            
+227  | 8105 | BDZZZZ   |                  | JSR   | DSPLY            
+228  | 8108 | BDZZZZ   |                  | JSR   | COMA             
+229  |      |          |                  |       |
+230  | 810B | 1808     |                  | INY   |                  
+231  | 810D | 4F       |                  | CLRA  |                  
+232  | 810E | 18E600   |                  | LDAB  | $00,Y            
+233  | 8111 | BDZZZZ   |                  | JSR   | BNBCD            
+234  | 8114 | BDZZZZ   |                  | JSR   | DSPLY            
+235  | 8117 | BDZZZZ   |                  | JSR   | COMA             
+236  |      |          |                  |       |
+237  | 811A | 1808     |                  | INY   |                  
+238  | 811C | 4F       |                  | CLRA  |                  
+239  | 811D | 18E600   |                  | LDAB  | $00,Y            
+240  | 8120 | BDZZZZ   |                  | JSR   | BNBCD            
+241  | 8123 | BDZZZZ   |                  | JSR   | DSPLY            
+242  | 8126 | BDZZZZ   |                  | JSR   | COMA             
+243  |      |          |                  |       |
+244  | 8129 | 1808     |                  | INY   |                  
+245  | 812B | 4F       |                  | CLRA  |                  
+246  | 812C | 18E600   |                  | LDAB  | $00,Y            
+247  | 812F | BDZZZZ   |                  | JSR   | BNBCD            
+248  | 8132 | BDZZZZ   |                  | JSR   | DSPLY            
+249  |      |          |                  |       |
+250  | 8135 | 188F     |                  | XGDY  |                  
+251  | 8137 | 971B     |                  | STAA  | BASE_H           
+1    |      | **********************************
+2    |      | *PROGRAMA DE EJEMPLO
+3    |      | **********************************
+4    |      | 1026     | PACTL            | EQU   | $1026
+5    |      | 1027     | PACNT            | EQU   | $1027
+6    |      | 1030     | ADCTL            | EQU   | $1030
+7    |      | 1031     | ADR1             | EQU   | $1031
+8    |      | 1032     | ADR2             | EQU   | $1032
+9    |      | 1033     | ADR3             | EQU   | $1033
+10   |      | 1034     | ADR4             | EQU   | $1034
+11   |      | 1039     | OPTION           | EQU   | $1039
+12   |      |          |                  |       |
+13   |      | 1000     | PORTA            | EQU   | $1000
+14   |      | 1008     | PORTD            | EQU   | $1008
+15   |      | 100A     | PORTE            | EQU   | $100A
+16   |      | 1002     | PORTG            | EQU   | $1002
+17   |      |          |                  |       |
+18   |      | 1001     | DDRA             | EQU   | $1001
+19   |      | 1009     | DDRD             | EQU   | $1009
+20   |      | 1003     | DDRG             | EQU   | $1003
+21   |      |          |                  |       |
+22   |      | 1024     | TMSK2            | EQU   | $1024
+23   |      | 1025     | TFLG2            | EQU   | $1025
+24   |      |          |                  |       |
+25   |      | 102F     | SCDR             | EQU   | $102F
+26   |      | 102D     | SCCR2            | EQU   | $102D
+27   |      | 102E     | SCSR             | EQU   | $102E
+28   |      | 102C     | SCCR1            | EQU   | $102C
+29   |      | 102B     | BAUD             | EQU   | $102B
+30   |      | 103C     | HPRIO            | EQU   | $103C
+31   |      | 1028     | SPCR             | EQU   | $1028
+32   |      | 105D     | CSCTL            | EQU   | $105D
+33   |      | 1038     | OPT2             | EQU   | $1038
+34   |      |          |                  |       |
+35   |      | * VARIABLES *********************
+36   |      |          |                  |       |
+37   |      | 0C       | ORDEN            | EQU   | $000C
+38   |      | 0D       | SEG              | EQU   | $000D
+39   |      | 0E       | U1               | EQU   | $000E
+40   |      | 0F       | U2               | EQU   | $000F
+41   |      | 10       | U3               | EQU   | $0010
+42   |      | 11       | U4               | EQU   | $0011
+43   |      | 12       | U5               | EQU   | $0012
+44   |      | 13       | V1               | EQU   | $0013
+45   |      | 14       | V2               | EQU   | $0014
+46   |      | 15       | BAS_H            | EQU   | $0015
+47   |      | 16       | BAS_L            | EQU   | $0016
+48   |      | 17       | V5               | EQU   | $0017
+49   |      | 18       | TEMPO            | EQU   | $0018
+50   |      | 19       | ALTO             | EQU   | $0019
+51   |      | 1A       | BAJO             | EQU   | $001A
+52   |      | 1B       | BASE_H           | EQU   | $001B
+53   |      | 1C       | BASE_L           | EQU   | $001C
+54   |      | 1D       | V3               | EQU   | $001D
+55   |      | 1E       | V4               | EQU   | $001E
+56   |      |          |                  |       |
+57   |      | **********************************
+58   |      | *CONFIGURA REGISTROS
+59   |      | **********************************
+60   | 8000 |          |                  | ORG   | $8000            * DIR DE INICIO
+61   | 8000 | 8E03FF   |                  | LDS   | #$03FF           * APUNTADOR DE STAK
+62   |      |          |                  |       |
+63   |      |          |                  |       |
+64   | 8003 | 8600     |                  | LDAA  | #$00             * CONFIG TODO EL PUERTO  A COMO ENTRADAS
+65   | 8005 | B71001   |                  | STAA  | DDRA             * EL PUERTO A
+66   |      |          |                  |       |
+67   | 8008 | 86FF     |                  | LDAA  | #$FF             * CONFIG TODO EL PUERTO  G COMO SALIDAS
+68   | 800A | B71003   |                  | STAA  | DDRG             * EL PUERTO G 
+69   |      |          |                  |       |
+70   | 800D | 8600     |                  | LDAA  | #$00             * SE PONE PUERTO G EN CEROS
+71   | 800F | B71002   |                  | STAA  | PORTG            
+72   |      |          |                  |       |
+73   | 8012 | CC302C   |                  | LDD   | #$302C           * CONFIGURA PUERTO SERIAL
+74   | 8015 | B7102B   |                  | STAA  | BAUD             * BAUD  9600  para cristal de 8MHz
+75   | 8018 | F7102D   |                  | STAB  | SCCR2            * HABILITA  RX Y TX PERO INTERRUPCN SOLO RX
+76   | 801B | 8600     |                  | LDAA  | #$00             
+77   | 801D | B7102C   |                  | STAA  | SCCR1            * 8 BITS
+78   |      |          |                  |       |
+79   | 8020 | 86FE     |                  | LDAA  | #$FE             * CONFIG PUERTO D COMO SALIDAS (EXCEPTO PD0)
+80   | 8022 | B71009   |                  | STAA  | DDRD             * SEA  ENABLE DEL DISPLAY  PD4  Y RS PD3
+81   |      |          |                  |       |
+82   |      |          |                  |       |
+83   | 8025 | 8604     |                  | LDAA  | #$04             
+84   | 8027 | B7103C   |                  | STAA  | HPRIO            
+85   |      |          |                  |       |
+86   | 802A | 8600     |                  | LDAA  | #$00             
+87   | 802C | 06       |                  | TAP   |                  
+88   |      |          |                  |       |
+89   |      |          |                  |       |
+90   |      |          |                  |       |
+91   |      |          |                  |       |
+92   |      |          |                  |       |
+93   |      |          |                  |       |
+94   |      |          |                  |       |
+95   |      | **********************************
+96   |      | *PROGRAMA PRINCIPAL
+97   |      | **********************************
+98   | 802D |          |MAIN              |       |                  
+99   | 802D | BDZZZZ   |                  | JSR   | INICIA           
+100  | 8030 | 863F     |                  | LDAA  | #$3F             
+101  | 8032 | 970C     |                  | STAA  | ORDEN            * CARGO UN (?) en 000A
+102  |      |          |                  |       |
+103  |      |          |                  |       |
+104  | 8034 |          |CICLO             |       |                  
+105  | 8034 | 960D     |                  | LDAA  | SEG              
+106  | 8036 | 27ZZ     |                  | BEQ   | CICLO            
+107  | 8038 | 7F000D   |                  | CLR   | SEG              
+108  |      |          |                  |       |
+109  | 803B | B61027   |                  | LDAA  | PACNT            
+110  | 803E | 9717     |                  | STAA  | V5               
+111  | 8040 | 7F1027   |                  | CLR   | PACNT            
+112  |      |          |                  |       |
+113  |      |          |                  |       |
+114  | 8043 | BDZZZZ   |                  | JSR   | DATARX           * DESPLIEGA DATO TRANSMITIDO
+115  | 8046 | 1809     |                  | DEY   |                  
+116  | 8048 | 188F     |                  | XGDY  |                  
+117  | 804A | 9719     |                  | STAA  | ALTO             
+118  | 804C | D71A     |                  | STAB  | BAJO             
+119  | 804E | 188F     |                  | XGDY  |                  
+120  | 8050 | 9619     |                  | LDAA  | ALTO             
+121  | 8052 | D61A     |                  | LDAB  | BAJO             
+122  | 8054 | BDZZZZ   |                  | JSR   | BINBCD           
+123  | 8057 | BDZZZZ   |                  | JSR   | DISPLAY          
+124  | 805A | BDZZZZ   |                  | JSR   | COMA             
+125  | 805D | BDZZZZ   |                  | JSR   | VOLTA            
+126  |      |          |                  |       |
+127  | 8060 | 4F       |                  | CLRA  |                  
+128  | 8061 | D613     |                  | LDAB  | V1               
+129  | 8063 | BDZZZZ   |                  | JSR   | BNBCD            
+130  | 8066 | BDZZZZ   |                  | JSR   | DSPLY            
+131  | 8069 | BDZZZZ   |                  | JSR   | COMA             
+132  |      |          |                  |       |
+133  | 806C | 4F       |                  | CLRA  |                  
+134  | 806D | D614     |                  | LDAB  | V2               
+135  | 806F | BDZZZZ   |                  | JSR   | BNBCD            
+136  | 8072 | BDZZZZ   |                  | JSR   | DSPLY            
+137  | 8075 | BDZZZZ   |                  | JSR   | COMA             
+138  |      |          |                  |       |
+139  | 8078 | 4F       |                  | CLRA  |                  
+140  | 8079 | D61D     |                  | LDAB  | V3               
+141  | 807B | BDZZZZ   |                  | JSR   | BNBCD            
+142  | 807E | BDZZZZ   |                  | JSR   | DSPLY            
+143  | 8081 | BDZZZZ   |                  | JSR   | COMA             
+144  |      |          |                  |       |
+145  | 8084 | 4F       |                  | CLRA  |                  
+146  | 8085 | D61E     |                  | LDAB  | V4               
+147  | 8087 | BDZZZZ   |                  | JSR   | BNBCD            
+148  | 808A | BDZZZZ   |                  | JSR   | DSPLY            
+149  | 808D | BDZZZZ   |                  | JSR   | COMA             
+150  |      |          |                  |       |
+151  | 8090 | 4F       |                  | CLRA  |                  
+152  | 8091 | D617     |                  | LDAB  | V5               
+153  | 8093 | BDZZZZ   |                  | JSR   | BNBCD            
+154  | 8096 | BDZZZZ   |                  | JSR   | DSPLY            
+155  |      |          |                  |       |
+156  | 8099 | BDZZZZ   |                  | JSR   | CRYTRN           
+157  |      |          |                  |       |
+158  | 809C | 7EZZZZ   |                  | JMP   | CICLO            
+159  |      |          |                  |       |
+160  |      |          |                  |       |
+161  |      | ***********************************
+162  |      | * INICIA
+163  |      | ***********************************
+164  | 809F |          |INICIA            |       |                  
+165  |      |          |                  |       |
+166  | 809F | 7F000D   |                  | CLR   | SEG              
+167  |      |          |                  |       |
+168  | 80A2 | 7F1002   |                  | CLR   | PORTG            
+169  | 80A5 | 86F4     |                  | LDAA  | #$F4             
+170  | 80A7 | 9718     |                  | STAA  | TEMPO            * TEMPO ES VARIABLE PARA CONTAR 244 CICLOS
+171  |      |          |                  |       |
+172  | 80A9 | CE1024   |                  | LDX   | #TMSK2           
+173  | 80AC | 1C0040   |                  | BSET  | $00,X,#$40       * HABILITA INTERRUPCION TIMER T-REAL
+174  | 80AF | 0E       |                  | CLI   |                  
+175  |      |          |                  |       |
+176  | 80B0 | CE1026   |                  | LDX   | #PACTL           
+177  | 80B3 | 1C0050   |                  | BSET  | $00,X,#$50       * HABILITA PAEN -ACUMULADOR PULSOS ALTOS-
+178  | 80B6 | 7F1027   |                  | CLR   | PACNT            * BORRA ACUMULADOR DE PULSOS
+179  |      |          |                  |       |
+180  | 80B9 | 8610     |                  | LDAA  | #$10             
+181  | 80BB | 971B     |                  | STAA  | BASE_H           * PONE UN #1060 COMO DIRECCION BASE INICIAL
+182  | 80BD | 8660     |                  | LDAA  | #$60             
+183  | 80BF | 971C     |                  | STAA  | BASE_L           
+184  |      |          |                  |       |
+185  | 80C1 | 18CE1060 |                  | LDY   | #$1060           
+186  |      |          |                  |       |
+187  | 80C5 | 8616     |                  | LDAA  | #$16             
+188  | 80C7 | 9715     |                  | STAA  | BAS_H            * PONE UN #1653 NUMERO TOTAL DE JUEGO DE MUESTRAS
+189  | 80C9 | 8653     |                  | LDAA  | #$53             
+190  | 80CB | 9716     |                  | STAA  | BAS_L            
+191  |      |          |                  |       |
+192  |      |          |                  |       |
+193  | 80CD | 7F0019   |                  | CLR   | ALTO             * INICIA INDICE MUESTRA EN 0
+194  | 80D0 | 7F001A   |                  | CLR   | BAJO             
+195  |      |          |                  |       |
+196  | 80D3 | 39       |                  | RTS   |                  
+197  |      | ***********************************
+198  |      | * SACA
+199  |      | ***********************************
+200  | 80D4 |          |SACA              |       |                  
+201  |      |          |                  |       |
+202  |      |          |                  |       |
+203  | 80D4 | 9619     |                  | LDAA  | ALTO             * INDICE DE MUESTRA (SEGUNDO)
+204  | 80D6 | D61A     |                  | LDAB  | BAJO             
+205  | 80D8 | 188F     |                  | XGDY  |                  
+206  | 80DA | 1808     |                  | INY   |                  
+207  | 80DC | 188F     |                  | XGDY  |                  
+208  | 80DE | BDZZZZ   |                  | JSR   | BINBCD           
+209  | 80E1 | BDZZZZ   |                  | JSR   | DISPLAY          
+210  | 80E4 | BDZZZZ   |                  | JSR   | COMA             
+211  |      |          |                  |       |
+212  | 80E7 | 961B     |                  | LDAA  | BASE_H           * INDICE DE MUESTRA (PARTICULAR)
+213  | 80E9 | D61C     |                  | LDAB  | BASE_L           
+214  | 80EB | 188F     |                  | XGDY  |                  
+215  |      |          |                  |       |
+216  | 80ED | 1808     |                  | INY   |                  
+217  | 80EF | 4F       |                  | CLRA  |                  
+218  | 80F0 | 18E600   |                  | LDAB  | $00,Y            
+219  | 80F3 | BDZZZZ   |                  | JSR   | BNBCD            
+220  | 80F6 | BDZZZZ   |                  | JSR   | DSPLY            
+221  | 80F9 | BDZZZZ   |                  | JSR   | COMA             
+222  |      |          |                  |       |
+223  | 80FC | 1808     |                  | INY   |                  
+224  | 80FE | 4F       |                  | CLRA  |                  
+225  | 80FF | 18E600   |                  | LDAB  | $00,Y            
+226  | 8102 | BDZZZZ   |                  | JSR   | BNBCD            
+227  | 8105 | BDZZZZ   |                  | JSR   | DSPLY            
+228  | 8108 | BDZZZZ   |                  | JSR   | COMA             
+229  |      |          |                  |       |
+230  | 810B | 1808     |                  | INY   |                  
+231  | 810D | 4F       |                  | CLRA  |                  
+232  | 810E | 18E600   |                  | LDAB  | $00,Y            
+233  | 8111 | BDZZZZ   |                  | JSR   | BNBCD            
+234  | 8114 | BDZZZZ   |                  | JSR   | DSPLY            
+235  | 8117 | BDZZZZ   |                  | JSR   | COMA             
+236  |      |          |                  |       |
+237  | 811A | 1808     |                  | INY   |                  
+238  | 811C | 4F       |                  | CLRA  |                  
+239  | 811D | 18E600   |                  | LDAB  | $00,Y            
+240  | 8120 | BDZZZZ   |                  | JSR   | BNBCD            
+241  | 8123 | BDZZZZ   |                  | JSR   | DSPLY            
+242  | 8126 | BDZZZZ   |                  | JSR   | COMA             
+243  |      |          |                  |       |
+244  | 8129 | 1808     |                  | INY   |                  
+245  | 812B | 4F       |                  | CLRA  |                  
+246  | 812C | 18E600   |                  | LDAB  | $00,Y            
+247  | 812F | BDZZZZ   |                  | JSR   | BNBCD            
+248  | 8132 | BDZZZZ   |                  | JSR   | DSPLY            
+249  |      |          |                  |       |
+250  | 8135 | 188F     |                  | XGDY  |                  
+251  | 8137 | 971B     |                  | STAA  | BASE_H           
